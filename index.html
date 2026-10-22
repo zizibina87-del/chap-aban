@@ -70,7 +70,10 @@ h1 span { color: var(--accent); }
 
 h2 { margin: 0 0 14px; font-size: 1.15rem; font-weight: 700; }
 .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
-.svc { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; min-width: 0; }
+.svc { background: var(--surface); border: 1px solid #1ea7ff; border-radius: 8px; padding: 16px 18px; min-width: 0;
+  box-shadow: 0 0 4px #1ea7ff, 0 0 12px rgba(30,167,255,.65), 0 0 26px rgba(30,167,255,.35), inset 0 0 8px rgba(30,167,255,.25);
+  transition: box-shadow .25s ease; }
+.svc:hover { box-shadow: 0 0 6px #4fc3ff, 0 0 18px rgba(30,167,255,.85), 0 0 38px rgba(30,167,255,.5), inset 0 0 12px rgba(30,167,255,.35); }
 .svc b { display: block; font-size: 1.05rem; font-weight: 700; }
 .svc small { color: var(--muted); font-size: 0.9rem; line-height: 1.6; display: block; margin-top: 2px; }
 
@@ -85,7 +88,9 @@ h2 { margin: 0 0 14px; font-size: 1.15rem; font-weight: 700; }
 .offer i::after { bottom: -12px; left: -12px; border-bottom-width: 2px; border-left-width: 2px; }
 .offer .label { font-size: 0.95rem; color: var(--muted); margin: 0 0 4px; }
 .offer .main { margin: 0; font-weight: 900; font-size: clamp(1.25rem, 5vw, 1.7rem); line-height: 1.7; }
-.code { display: inline-block; direction: ltr; unicode-bidi: isolate; font-family: "Courier New", ui-monospace, monospace; font-weight: 700; letter-spacing: 0.08em; background: var(--surface); color: var(--ink); border: 2px dashed var(--accent); border-radius: 4px; padding: 2px 14px; margin-top: 6px; }
+.code { display: inline-block; cursor: pointer; user-select: all; font-size: inherit; direction: ltr; unicode-bidi: isolate; font-family: "Courier New", ui-monospace, monospace; font-weight: 700; letter-spacing: 0.08em; background: var(--surface); color: var(--ink); border: 2px dashed var(--accent); border-radius: 4px; padding: 2px 14px; margin-top: 6px; }
+.code:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.code-hint { display: block; margin-top: 6px; font-size: .85rem; font-weight: 500; color: var(--muted); min-height: 1.6em; }
 .rules { list-style: none; margin: 18px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); display: grid; gap: 4px; font-weight: 700; }
 .rules li span { color: var(--accent); }
 
@@ -130,7 +135,8 @@ footer { border-top: 1px solid var(--line); padding-top: 24px; display: grid; ga
     <div class="offer">
       <i aria-hidden="true"></i>
       <p class="label">نکته مهم</p>
-      <p class="main">کد تخفیف ۲ میلیونی<br><span class="code" id="code">AHVAZEVENT</span></p>
+      <p class="main">کد تخفیف ۲ میلیونی<br><span class="code" id="code" role="button" tabindex="0" title="برای کپی کلیک کنید">AHVAZEVENT</span>
+        <span class="code-hint" id="code-hint" aria-live="polite">برای کپی روی کد بزنید</span></p>
       <ul class="rules">
         <li><span>●</span> کف خرید (حداقل سفارش): ۲۰ میلیون تومان</li>
         <li><span>●</span> مهلت استفاده از تخفیف: تا پایان آبان ۱۴۰۵</li>
@@ -176,6 +182,28 @@ footer { border-top: 1px solid var(--line); padding-top: 24px; display: grid; ga
       navigator.clipboard.writeText("09359532127").then(done, fallback);
     } catch (e) { fallback(); }
   });
+
+  var code = document.getElementById("code"), hint = document.getElementById("code-hint");
+  function copyText(t, ok, fail) {
+    function legacy() {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        var r = document.execCommand("copy"); document.body.removeChild(ta);
+        r ? ok() : fail();
+      } catch (e) { fail(); }
+    }
+    try { navigator.clipboard.writeText(t).then(ok, legacy); } catch (e) { legacy(); }
+  }
+  function copyCode() {
+    copyText("AHVAZEVENT", function () {
+      hint.textContent = "✓ کد کپی شد";
+      setTimeout(function () { hint.textContent = "برای کپی روی کد بزنید"; }, 2000);
+    }, function () { hint.textContent = "کد را انتخاب و کپی کنید"; });
+  }
+  code.addEventListener("click", copyCode);
+  code.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); copyCode(); } });
 })();
 </script>
 </body>
